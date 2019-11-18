@@ -7,6 +7,10 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const sassMiddleware = require('node-sass-middleware');
 const serveFavicon = require('serve-favicon');
+const mongoose = require("mongoose");
+const session    = require("express-session");
+const MongoStore = require("connect-mongo")(session);
+const User = require("./models/user");
 
 const indexRouter = require('./routes/index');
 
@@ -29,7 +33,40 @@ app.use(sassMiddleware({
   sourceMap: true
 }));
 
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  cookie: { maxAge: 60000 },
+  resave: true,
+  saveUninitialized: false,
+  sameSite: true,
+  httpOnly: true,
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+    ttl: 24 * 60 * 60 // 1 day
+  })
+}));
+
+
+app.use((req, res, next) => {
+  const userId = req.session.user;
+  if (userId) {
+    User.findById(userId)
+      .then(user => {
+        req.user = user;
+        res.locals.user = req.user;
+        next();
+      })
+      .catch(error => {
+        next(error);
+      });
+  } else {
+    next();
+  }
+});
+
 app.use('/', indexRouter);
+
 
 // Catch missing routes and forward to error handler
 app.use((req, res, next) => {

@@ -1,0 +1,12 @@
+<h1>Hello {{user.userName}}</h1>
+<form action="/profile/edit" method="POST">
+    <label><h3>Change Username</h3></label>
+    <input type="text" name="userName" value={{user.userName}}>
+    <button type="submit">Save</button>
+</form>
+
+<h3>Account Created at</h3>
+<h1>{{user.createdAt}}</h1>
+
+
+

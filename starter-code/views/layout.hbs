@@ -5,6 +5,17 @@
     <link rel='stylesheet' href='/styles/style.css' />
   </head>
   <body>
+    <nav>
+      {{#if user}}
+        <a href="/profile/{{user.userName}}">{{user.userName}}</a>
+        <form action="/sign-out" method="POST">
+          <button>Sign Out</button>
+        </form>
+        {{else}}
+        <a href="/sign-up">Sign Up</a>
+        <a href="/sign-in">Sign In</a>
+      {{/if}}
+    </nav>
     {{{body}}}
   </body>
 </html>
